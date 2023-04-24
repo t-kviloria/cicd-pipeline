@@ -6,9 +6,10 @@ pipeline {
         checkout scm
       }
     }
+
     stage('Build') {
       steps {
-        sh '/scripts/build.sh'
+        sh 'scripts/build.sh'
       }
     }
 
