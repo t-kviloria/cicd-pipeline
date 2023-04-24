@@ -11,7 +11,7 @@ pipeline {
       steps {
         sh '''
 
-./build.sh'''
+.scripts/build.sh'''
       }
     }
 
