@@ -2,13 +2,14 @@ pipeline {
   agent any
   stages {
     stage('Checkout code') {
-        steps {
-            checkout scm
-        }
+      steps {
+        checkout scm
+      }
     }
+
     stage('Build') {
       steps {
-        sh 'sh scripts/build.sh'
+        sh 'sh ./scripts/build.sh'
       }
     }
 
