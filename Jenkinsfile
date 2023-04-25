@@ -1,25 +1,24 @@
 pipeline {
-  agent any
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-        script {
-          checkout scm
-          def customImage = docker.build("${registry}:${env.BUILD_ID}")
+    agent any
+    stages {
+        stage('Build Docker image') {
+            steps {
+                script {
+                    def dockerImage = docker.build('js-app', '--file Dockerfile .')
+                }
+            }
         }
-
-      }
+        stage('Build') {
+            steps {
+                script {
+                    dockerImage.inside {
+                        sh '.scripts/build.sh'
+                    }
+                }
+            }
+        }
     }
-
-    stage('Build') {
-      steps {
-        sh 'chmod +x ./scripts/build.sh'
-        sh './scripts/build.sh'
-      }
-    }
-
-  }
+}
   environment {
     registry = 'itemo/practical_task_ci_cd'
   }
