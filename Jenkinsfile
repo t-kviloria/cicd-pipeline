@@ -9,7 +9,7 @@ pipeline {
 
     stage('Build') {
       steps {
-        echo "aba ra xdeba"
+       sh './scripts/build.sh'
       }
     }
 
