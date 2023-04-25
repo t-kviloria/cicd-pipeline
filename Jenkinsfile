@@ -9,7 +9,7 @@ pipeline {
     }
     stage('Build') {
       steps {
-        sh chmod +x 'hello.sh' && sh './scripts/hello.sh'
+        sh chmod +x ./scripts/hello.sh && sh './scripts/hello.sh'
       }
     }
   }
