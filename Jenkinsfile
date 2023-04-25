@@ -9,7 +9,7 @@ pipeline {
 
     stage('Build') {
       steps {
-        sudo sh './scripts/build.sh'
+        './scripts/build.sh'
       }
     }
 
