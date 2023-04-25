@@ -1,19 +1,21 @@
 pipeline {
   agent any
+  
   stages {
-    stage('Checkout code') {
+    stage('Checkout') {
       steps {
-        checkout scm
+        scm
       }
     }
 
     stage('Build') {
       steps {
-       sh './scripts/build.sh'
+        sh './scripts/build.sh'
       }
     }
-
   }
+}
+
   environment {
     registry = 'itemo/practical_task_ci_cd'
   }
