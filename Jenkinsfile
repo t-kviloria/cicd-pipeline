@@ -15,8 +15,8 @@ pipeline {
     stage('Build') {
       steps {
         script {
-          dockerImage.inside {
-            sh './scripts/build.sh'         }
+         docker.image("${registry}:${env.BUILD_ID}").inside {c ->
+          sh './scripts/build.sh'}
           }
         }
       }
@@ -25,3 +25,4 @@ pipeline {
     environment {
       registry = 'itemo/practical_task_ci_cd'
     }
+}
