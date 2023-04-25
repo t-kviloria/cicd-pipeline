@@ -22,7 +22,6 @@ pipeline {
             }
         }
     }
-}
 
   environment {
     registry = 'itemo/practical_task_ci_cd'
