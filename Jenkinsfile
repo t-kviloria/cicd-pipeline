@@ -13,10 +13,8 @@ pipeline {
         sh './scripts/build.sh'
       }
     }
-  }
-}
 
-  environment {
+    environment {
     registry = 'itemo/practical_task_ci_cd'
   }
 }
