@@ -7,18 +7,7 @@ pipeline {
       }
     }
 
-    stage('Application Build') {
-      steps {
-        script {
-          def appImage = docker.build("${registry}:${env.BUILD_ID}")
-          appImage.inside {
-            sh 'chmod +x ./scripts/build.sh'
-            sh './scripts/build.sh'
-          }
-        }
 
-      }
-    }
 
     stage('Tests') {
       steps {
