@@ -27,11 +27,13 @@ pipeline {
       }
     }
 
-    stage('Docker Image Build') {
+   stage('Build') {
       steps {
         script {
+          checkout scm
           def customImage = docker.build("${registry}:${env.BUILD_ID}")
         }
+
       }
     }
 
