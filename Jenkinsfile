@@ -4,7 +4,8 @@ pipeline {
     stage('Build Docker image') {
       steps {
         script {
-          def dockerImage = docker.build('js-app', '--file Dockerfile .')
+          checkout scm
+          def customImage = docker.build("${registry}:${env.BUILD_ID}")
         }
 
       }
@@ -14,15 +15,14 @@ pipeline {
       steps {
         script {
           dockerImage.inside {
-            sh './scripts/build.sh'
+            sh './scripts/build.sh'         }
           }
+
         }
-
       }
-    }
 
+    }
+    environment {
+      registry = 'itemo/practical_task_ci_cd'
+    }
   }
-  environment {
-    registry = 'itemo/practical_task_ci_cd'
-  }
-}
