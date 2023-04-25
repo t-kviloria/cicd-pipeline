@@ -15,7 +15,8 @@ pipeline {
       steps {
         script {
           docker.image("${registry}:${env.BUILD_ID}").inside {c ->
-          sh 'chmod +x ./scripts/build.sh'  
+          sh 'chmod +x ./scripts/build.sh'
+          echo "Running build.sh script"  
           sh ' ./scripts/build.sh'}
         }
 
