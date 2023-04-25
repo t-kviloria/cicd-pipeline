@@ -1,54 +1,29 @@
 pipeline {
-  agent any
-  stages {
-    stage('Checkout') {
-      steps {
-        git(url: 'https://github.com/t-kviloria/cicd-pipeline', branch: 'main')
-      }
-    }
-
-    stage('App Build') {
-      steps {
-        script {
-          sh 'chmod +x ./scripts/build.sh'
-          sh './scripts/build.sh'
+    agent {
+        docker {
+            image 'docker:latest'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
-
-      }
     }
-
-    stage('Tests') {
-      steps {
-        script {
-          sh 'chmod +x ./scripts/test.sh'
-          sh './scripts/test.sh'
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/t-kviloria/cicd-pipeline']]])
+            }
         }
-
-      }
-    }
-
-    stage('Docker Image Build') {
-      steps {
-        script {
-          def customImage = docker.build("${registry}:${env.BUILD_ID}")
+        stage('Build') {
+            steps {
+                sh './scripts/build.sh'
+            }
         }
-
-      }
-    }
-
-    stage('Push Docker Image') {
-      steps {
-        script {
-          def dockerImage = docker.build("${registry}:${env.BUILD_ID}")
-          docker.withRegistry('', 'dockerhub-id') {
-            dockerImage.push()
-          }
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t practical_task_ci_cd .'
+            }
         }
-
-      }
     }
+}
 
-  }
   environment {
     registry = 'itemo/practical_task_ci_cd'
   }
