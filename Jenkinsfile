@@ -1,28 +1,59 @@
 pipeline {
-    agent {
-        docker {
-            image 'docker:latest'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
+    
     stages {
-        stage('Checkout') {
+        stage('Build Docker Image') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/t-kviloria/cicd-pipeline']]])
+                script {
+                    // Build Docker image
+                    docker.build("my-app")
+                }
             }
         }
-        stage('Build') {
+        
+        stage('Copy Git Repository') {
             steps {
-                sh 'chmod +x ./scripts/build.sh'
-                sh './scripts/build.sh'
+                script {
+                    // Clone Git repository
+                    sh "git clone https://github.com/t-kviloria/cicd-pipeline"
+                    // Copy repository files to Docker container
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker-creds') {
+                        docker.image('my-app').inside {
+                            sh "rm -rf /app/*"
+                            sh "cp -r /workspace/my-app/* /app"
+                        }
+                    }
+                }
             }
         }
-        stage('Docker Build') {
+        
+        stage('Build Application') {
             steps {
-                sh 'docker build -t practical_task_ci_cd .'
+                script {
+                    // Build application inside Docker container
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker-creds') {
+                        docker.image('my-app').inside {
+                            sh "cd /app && ./scripts/build.sh"
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Test Application') {
+            steps {
+                script {
+                    // Test application inside Docker container
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker-creds') {
+                        docker.image('my-app').inside {
+                            sh "cd /app && ./scripts/test.sh"
+                        }
+                    }
+                }
             }
         }
     }
+}
 
   environment {
     registry = 'itemo/practical_task_ci_cd'
