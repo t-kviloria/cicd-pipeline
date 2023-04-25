@@ -1,22 +1,27 @@
 pipeline {
   agent any
   stages {
-    stage('Git Checkout') {
+    stage('Checkout') {
       steps {
-        checkout scm
+        git(url: 'https://github.com/t-kviloria/cicd-pipeline', branch: 'main')
       }
     }
 
+    stage('App Build') {
+      steps {
+        script {
+          sh 'chmod +x ./scripts/build.sh'
+          sh './scripts/build.sh'
+        }
 
+      }
+    }
 
     stage('Tests') {
       steps {
         script {
-          def appImage = docker.build("${registry}:${env.BUILD_ID}")
-          appImage.inside {
-            sh 'chmod +x ./scripts/test.sh'
-            sh './scripts/test.sh'
-          }
+          sh 'chmod +x ./scripts/test.sh'
+          sh './scripts/test.sh'
         }
 
       }
@@ -25,14 +30,24 @@ pipeline {
     stage('Docker Image Build') {
       steps {
         script {
-          def appImage = docker.build("${registry}:${env.BUILD_ID}")
-          appImage.push()
+          def customImage = docker.build("${registry}:${env.BUILD_ID}")
         }
 
       }
     }
 
-  }
+    stage('Push Docker Image') {
+        steps {
+            script {
+                def dockerImage = docker.build("${registry}:${env.BUILD_ID}")
+                docker.withRegistry('', 'dockerhub-id') {
+                    dockerImage.push()
+                }
+            }
+        }
+    }
+
+    }
   environment {
     registry = 'itemo/practical_task_ci_cd'
   }
