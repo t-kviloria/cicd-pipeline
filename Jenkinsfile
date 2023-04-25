@@ -16,6 +16,7 @@ pipeline {
             sh './scripts/build.sh'
           }
         }
+
       }
     }
 
@@ -28,6 +29,7 @@ pipeline {
             sh './scripts/test.sh'
           }
         }
+
       }
     }
 
@@ -37,10 +39,11 @@ pipeline {
           def appImage = docker.build("${registry}:${env.BUILD_ID}")
           appImage.push()
         }
+
       }
     }
-  }
 
+  }
   environment {
     registry = 'itemo/practical_task_ci_cd'
   }
