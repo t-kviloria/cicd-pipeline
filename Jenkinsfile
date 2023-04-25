@@ -37,17 +37,18 @@ pipeline {
     }
 
     stage('Push Docker Image') {
-        steps {
-            script {
-                def dockerImage = docker.build("${registry}:${env.BUILD_ID}")
-                docker.withRegistry('', 'dockerhub-id') {
-                    dockerImage.push()
-                }
-            }
+      steps {
+        script {
+          def dockerImage = docker.build("${registry}:${env.BUILD_ID}")
+          docker.withRegistry('', 'dockerhub-id') {
+            dockerImage.push()
+          }
         }
+
+      }
     }
 
-    }
+  }
   environment {
     registry = 'itemo/practical_task_ci_cd'
   }
