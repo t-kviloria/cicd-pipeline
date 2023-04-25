@@ -1,59 +1,53 @@
 pipeline {
   agent any
   stages {
-    stage('Build Docker Image') {
+    stage('Checkout') {
+      steps {
+        git(url: 'https://github.com/KonstantinFomenko/cicd-pipeline', branch: 'main')
+      }
+    }
+
+    stage('App Build') {
       steps {
         script {
-          docker.build("my-app")
+          sh 'chmod +x ./scripts/build.sh'
+          sh './scripts/build.sh'
         }
 
       }
     }
 
-    stage('Copy Git Repository') {
+    stage('Tests') {
       steps {
         script {
-          sh "git clone https://github.com/t-kviloria/cicd-pipeline"
-          // Copy repository files to Docker container
-          docker.withRegistry('https://registry.hub.docker.com', 'docker-creds') {
-            docker.image('my-app').inside {
-              sh "rm -rf /app/*"
-              sh "cp -r /workspace/my-app/* /app"
+          sh 'chmod +x ./scripts/test.sh'
+          sh './scripts/test.sh'
+        }
+
+      }
+    }
+
+    stage('Docker Image Build') {
+      steps {
+        script {
+          def customImage = docker.build("${registry}:${env.BUILD_ID}")
+        }
+
+      }
+    }
+
+    stage('Push Docker Image') {
+        steps {
+            script {
+                def dockerImage = docker.build("${registry}:${env.BUILD_ID}")
+                docker.withRegistry('', 'dockerhub-id') {
+                    dockerImage.push()
+                }
             }
-          }
         }
+     }
 
-      }
     }
-
-    stage('Build Application') {
-      steps {
-        script {
-          docker.withRegistry('https://registry.hub.docker.com', 'docker-creds') {
-            docker.image('my-app').inside {
-              sh "cd /app && ./scripts/build.sh"
-            }
-          }
-        }
-
-      }
-    }
-
-    stage('Test Application') {
-      steps {
-        script {
-          docker.withRegistry('https://registry.hub.docker.com', 'docker-creds') {
-            docker.image('my-app').inside {
-              sh "cd /app && ./scripts/test.sh"
-            }
-          }
-        }
-
-      }
-    }
-
-  }
   environment {
     registry = 'itemo/practical_task_ci_cd'
   }
-}
