@@ -1,13 +1,14 @@
 pipeline {
   agent any
+  
   stages {
+    
     stage('Build Docker image') {
       steps {
         script {
           checkout scm
           def customImage = docker.build("${registry}:${env.BUILD_ID}")
         }
-
       }
     }
 
@@ -17,7 +18,6 @@ pipeline {
           dockerImage.inside {
             sh './scripts/build.sh'         }
           }
-
         }
       }
 
@@ -25,4 +25,3 @@ pipeline {
     environment {
       registry = 'itemo/practical_task_ci_cd'
     }
-  }
